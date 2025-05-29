@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Payment Gateway</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --accent: #fd79a8;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --danger: #d63031;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            animation: gradientShift 15s ease infinite;
+            background-size: 200% 200%;
+        }
+        
+        @keyframes gradientShift {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+        
+        .container:hover {
+            transform: translateY(-5px);
+        }
+        
+        .header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% {transform: rotate(30deg) translate(-10%, -10%);}
+            100% {transform: rotate(30deg) translate(10%, 10%);}
+        }
+        
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            position: relative;
+            font-weight: 600;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1rem;
+            position: relative;
+        }
+        
+        .dashboard {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.7);
+            border-bottom: 1px solid #eee;
+        }
+        
+        .balance-card {
+            flex: 1;
+            min-width: 200px;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .balance-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--accent));
+        }
+        
+        .balance-title {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .balance-amount {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        .balance-change {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .positive {
+            color: var(--success);
+        }
+        
+        .negative {
+            color: var(--danger);
+        }
+        
+        .payment-container {
+            padding: 30px;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            border-radius: 3px;
+        }
+        
+        .payment-methods {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .method {
+            flex: 1;
+            min-width: 200px;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .method:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+        
+        .method.active {
+            border-color: var(--primary);
+            background: rgba(108, 92, 231, 0.05);
+        }
+        
+        .method::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+        
+        .method:hover::after, .method.active::after {
+            transform: scaleX(1);
+        }
+        
+        .method-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+                
+        .fas fa-money-bill-wave {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .method h3 {
+            margin-bottom: 10px;
+            color: var(--dark);
+            font-weight: 600;
+        }
+        
+        .method p {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .payment-details {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {opacity: 0; transform: translateY(20px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+        
+        .payment-details h2 {
+            margin-bottom: 20px;
+            color: var(--dark);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #eee;
+        }
+        
+        .detail-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .detail-label {
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .detail-value {
+            color: var(--dark);
+            font-weight: 600;
+        }
+        
+        .qr-container {
+            text-align: center;
+            margin: 25px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {box-shadow: 0 0 0 0 rgba(108, 92, 231, 0.2);}
+            70% {box-shadow: 0 0 0 15px rgba(108, 92, 231, 0);}
+            100% {box-shadow: 0 0 0 0 rgba(108, 92, 231, 0);}
+        }
+        
+        .qr-code {
+            max-width: 250px;
+            width: 100%;
+            height: auto;
+            margin: 0 auto 15px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 10px;
+            background: white;
+        }
+        
+        .qr-instruction {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(108, 92, 231, 0.3);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(108, 92, 231, 0.05);
+            transform: translateY(-3px);
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0% {transform: translateY(0px);}
+            50% {transform: translateY(-10px);}
+            100% {transform: translateY(0px);}
+        }
+        
+        .confirmation {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 184, 148, 0.1);
+            border-radius: 10px;
+            border-left: 5px solid var(--success);
+            display: none;
+        }
+        
+        .confirmation.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .confirmation p {
+            color: var(--success);
+            font-weight: 500;
+        }
+        
+        .transactions {
+            margin-top: 40px;
+        }
+        
+        .transaction-list {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            transition: background 0.3s ease;
+        }
+        
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+        
+        .transaction-item:hover {
+            background: #f9f9f9;
+        }
+        
+        .transaction-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .transaction-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(108, 92, 231, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+        
+        .transaction-details h4 {
+            font-size: 1rem;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .transaction-details p {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .transaction-amount {
+            font-weight: 600;
+            color: var(--success);
+        }
+        
+        .negative-amount {
+            color: var(--danger);
+        }
+        
+        @media (max-width: 768px) {
+            .payment-methods {
+                flex-direction: column;
+            }
+            
+            .method {
+                min-width: 100%;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .dashboard {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Payment Gateway</h1>
+            <p>Secure and easy payment processing</p>
+        </div>
+        
+        <div class="dashboard">
+            <div class="balance-card">
+                <div class="balance-title">Pendapatan Bulan Ini</div>
+                <div class="balance-amount" id="total-balance">Rp 1,250,000</div>
+                <div class="balance-change positive">
+                    <i class="fas fa-arrow-up"></i> Rp 250,000 (24%)
+                </div>
+            </div>
+            
+            <div class="balance-card">
+                <div class="balance-title">Pendapatan Minggu ini</div>
+                <div class="balance-amount">Rp 350,000</div>
+                <div class="balance-change positive">
+                    <i class="fas fa-arrow-up"></i> 3 transactions
+                </div>
+            </div>
+            
+            <div class="balance-card">
+                <div class="balance-title">Transaki Yang Tertunda</div>
+                <div class="balance-amount">Rp 120,000</div>
+                <div class="balance-change negative">
+                    <i class="fas fa-clock"></i> 2 payments
+                </div>
+            </div>
+        </div>
+        
+        <div class="payment-container">
+            <h2 class="section-title">Metode Pembayaran</h2>
+            
+            <div class="payment-methods">
+                <div class="method active" onclick="selectMethod(this)">
+                    <div class="method-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>DANA</h3>
+                    <p>Transfer to DANA number</p>
+                    <div class="detail-item" style="margin-top: 15px;">
+                        <span class="detail-label">Number:</span>
+                        <span class="detail-value">087716837332</span>
+                    </div>
+                </div>
+                
+                <div class="method" onclick="selectMethod(this)">
+                    <div class="method-icon">
+                        <i class="fab fa-google-wallet"></i>
+                    </div>
+                    <h3>GoPay</h3>
+                    <p>Transfer to GoPay number</p>
+                    <div class="detail-item" style="margin-top: 15px;">
+                        <span class="detail-label">Number:</span>
+                        <span class="detail-value">087716837332</span>
+                    </div>
+                </div>
+                
+                <div class="method" onclick="selectMethod(this)">
+                    <div class="method-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <h3>OVO</h3>
+                    <p>Transfer to OVO number</p>
+                    <div class="detail-item" style="margin-top: 15px;">
+                        <span class="detail-label">Number:</span>
+                        <span class="detail-value">087716837332</span>
+                    </div>
+                </div>
+                
+                <div class="method" onclick="selectMethod(this)">
+                    <div class="method-icon">
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    <h3>QR Payment</h3>
+                    <p>Scan QR code to pay</p>
+                </div>
+            </div>
+            
+            <div class="payment-details">
+                <h2>Payment Information</h2>
+                
+                <div class="detail-item">
+                    <span class="detail-label">Payment Metode</span>
+                    <span class="detail-value" id="selected-method">DANA</span>
+                </div>
+                
+                <div class="detail-item">
+                    <span class="detail-label">Transfer Ke</span>
+                    <span class="detail-value" id="account-number">087716837332</span>
+                </div>
+                
+                <div class="detail-item">
+                    <span class="detail-label">Mininal Transaksi</span>
+                    <span class="detail-value">Rp 20.000</span>
+                </div>
+            </div>
+            
+            <div class="qr-container" id="qr-section" style="display: none;">
+                <img src="https://qu.ax/AdKsS.jpg" alt="QR Code" class="qr-code floating">
+                <p class="qr-instruction">Scan this QR code using your mobile banking app to complete the payment</p>
+            </div>
+            
+            <div class="confirmation" id="confirmation">
+                <p><i class="fas fa-check-circle"></i> Konfirmasi Jika Anda Sudah Transfer Kirimkan Bukti Screenshot Transaksi Admin Akan memproses</p>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="showConfirmation()">
+                    <i class="fas fa-paper-plane"></i> ❗Send Bukti Transaksi Ke Admin❗
+                </button>
+                <button class="btn btn-secondary" onclick="copyAccountNumber()">
+                    <i class="far fa-copy"></i> Salin Nomor/link yang tertaut
+                </button>
+            </div>
+            
+            <div class="transactions">
+                <h2 class="section-title">Recent Transactions</h2>
+                
+                <div class="transaction-list">
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-icon">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <div class="transaction-details">
+                                <h4>DANA Payment</h4>
+                                <p>Today, 10:30 AM</p>
+                            </div>
+                        </div>
+                        <div class="transaction-amount">+Rp 150,000</div>
+                    </div>
+                    
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-icon">
+                                <i class="fab fa-google-wallet"></i>
+                            </div>
+                            <div class="transaction-details">
+                                <h4>GoPay Transfer</h4>
+                                <p>Today, 09:15 AM</p>
+                            </div>
+                        </div>
+                        <div class="transaction-amount">+Rp 200,000</div>
+                    </div>
+                    
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-icon">
+                                <i class="fas fa-qrcode"></i>
+                            </div>
+                            <div class="transaction-details">
+                                <h4>QR Payment</h4>
+                                <p>Yesterday, 04:45 PM</p>
+                            </div>
+                        </div>
+                        <div class="transaction-amount">+Rp 75,000</div>
+                    </div>
+                    
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-icon">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <div class="transaction-details">
+                                <h4>DANA Payment</h4>
+                                <p>Yesterday, 02:30 PM</p>
+                            </div>
+                        </div>
+                        <div class="transaction-amount">+Rp 125,000</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize with random balance that increases over time
+        let baseBalance = 1250000;
+        let transactions = 0;
+        
+        function updateBalance() {
+            transactions++;
+            const randomIncrease = Math.floor(Math.random() * 50000) + 10000;
+            baseBalance += randomIncrease;
+            
+            document.getElementById('total-balance').textContent = formatCurrency(baseBalance);
+            
+            // Update today's income
+            const todayIncome = 350000 + (transactions * randomIncrease);
+            document.querySelectorAll('.balance-amount')[1].textContent = formatCurrency(todayIncome);
+            document.querySelectorAll('.balance-change')[1].innerHTML = 
+                `<i class="fas fa-arrow-up"></i> ${transactions + 3} transactions`;
+            
+            // Add new transaction to list
+            const methods = ['DANA Payment', 'GoPay Transfer', 'QR Payment'];
+            const method = methods[Math.floor(Math.random() * methods.length)];
+            const icons = ['fa-mobile-alt', 'fa-google-wallet', 'fa-qrcode'];
+            const icon = icons[methods.indexOf(method)];
+            
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            const transactionList = document.querySelector('.transaction-list');
+            const newTransaction = document.createElement('div');
+            newTransaction.className = 'transaction-item';
+            newTransaction.innerHTML = `
+                <div class="transaction-info">
+                    <div class="transaction-icon">
+                        <i class="fas ${icon}"></i>
+                    </div>
+                    <div class="transaction-details">
+                        <h4>${method}</h4>
+                        <p>Today, ${timeString}</p>
+                    </div>
+                </div>
+                <div class="transaction-amount">+${formatCurrency(randomIncrease)}</div>
+            `;
+            
+            transactionList.insertBefore(newTransaction, transactionList.firstChild);
+            
+            // Remove oldest transaction if more than 6
+            if (transactionList.children.length > 6) {
+                transactionList.removeChild(transactionList.lastChild);
+            }
+        }
+        
+        function formatCurrency(amount) {
+            return 'Rp ' + amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        
+        function selectMethod(element) {
+            // Remove active class from all methods
+            document.querySelectorAll('.method').forEach(m => {
+                m.classList.remove('active');
+            });
+            
+            // Add active class to clicked method
+            element.classList.add('active');
+            
+            // Update payment details
+            const methodName = element.querySelector('h3').textContent;
+            document.getElementById('selected-method').textContent = methodName;
+            
+            // Handle account number display
+            const accountNumber = element.querySelector('.detail-value') ? element.querySelector('.detail-value').textContent : '';
+            document.getElementById('account-number').textContent = accountNumber;
+            
+            // Show/hide QR section
+            if (methodName === 'QR Payment') {
+                document.getElementById('qr-section').style.display = 'block';
+                document.getElementById('account-number').textContent = 'Scan QR Code';
+            } else {
+                document.getElementById('qr-section').style.display = 'none';
+            }
+        }
+        
+        function copyAccountNumber() {
+            const accountNumber = document.getElementById('account-number').textContent;
+            if (accountNumber !== 'Scan QR Code') {
+                navigator.clipboard.writeText(accountNumber).then(() => {
+                    alert('Account number copied to clipboard: ' + accountNumber);
+                });
+            }
+        }
+        
+        function showConfirmation() {
+            const confirmation = document.getElementById('confirmation');
+            confirmation.classList.add('show');
+            
+            // Open WhatsApp with the payment proof message
+            const method = document.getElementById('selected-method').textContent;
+            const number = document.getElementById('account-number').textContent;
+            const message = `Hi, I've made payment via ${method} ${method !== 'QR Payment' ? 'to ' + number : ''}. Here's the payment proof:`;
+            
+            setTimeout(() => {
+                window.open(`https://wa.me/6287716837332?text=${encodeURIComponent(message)}`, '_blank');
+            }, 1000);
+            
+            // Simulate new payment
+            setTimeout(updateBalance, 2000);
+        }
+        
+        // Initialize with first method selected
+        document.addEventListener('DOMContentLoaded', function() {
+            selectMethod(document.querySelector('.method'));
+            
+            // Update balance every 30-60 seconds
+            setInterval(updateBalance, Math.random() * 30000 + 30000);
+        });
+    </script>
+</body>
+</html>
